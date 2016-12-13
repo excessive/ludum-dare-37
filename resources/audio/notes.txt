@@ -1,0 +1,15 @@
+cut highs off, raise lows
+
+BOSS:
+
+1. DONT [[[Bass and Treble (Bass to 15)]]]
+2. Duplicate track
+3. Change pitch (-20) Clip A
+3. Change pitch (-10) Clip B
+4. Phaser Stages (Stages 25,Dry 255,LFO 0.2, LFO 0, Depth,248, Feedback 0)
+5. Normalize -1.2
+
+Hero:
+
+Change Pitch 20
+
