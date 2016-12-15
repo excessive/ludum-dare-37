@@ -64,7 +64,7 @@ function scene:enter()
 	self.world:addSystem(tiny.processingSystem {
 		filter = tiny.requireAll("capsules", "animation"),
 		process = function(_, entity)
-			if not entity.matrix or not entity.animation or not entity.animation.current_animation then
+			if not entity.matrix or not entity.animation or not entity.animation.current_matrices then
 				return
 			end
 			for _, category in pairs(entity.capsules) do
@@ -196,10 +196,10 @@ function scene:enter()
 				}
 			}
 			-- spike comes up from ground after 0.25s
-			spike.animation:reset()
+			spike.animation:stop()
 			spike.animation:play("wiggle")
+			spike.animation:pause("wiggle")
 			spike.animation:update(0)
-			spike.animation:reset()
 			wait(0.5)
 			spike.animation:play("wiggle")
 			spike.blob_shadow = false
@@ -223,10 +223,9 @@ function scene:enter()
 	-- Player animations
 	_G.EVENT:listen("player idle", function()
 		local anim = self.player.animation
-		if anim.current_animation ~= "run_to_idle" and anim.current_animation ~= "idle" then
-			anim:reset()
-			anim:play("run_to_idle", function(self)
-				self:reset()
+		if not anim.active["idle"] and not anim.active["run_to_idle"] then
+			anim:stop()
+			anim:play("run_to_idle", 1.0, 1.0, function(self)
 				self:play("idle")
 			end)
 		end
@@ -234,10 +233,9 @@ function scene:enter()
 
 	_G.EVENT:listen("player run", function()
 		local anim = self.player.animation
-		if anim.current_animation ~= "idle_to_run" and anim.current_animation ~= "run" then
-			anim:reset()
-			anim:play("idle_to_run", function(self)
-				self:reset()
+		if not anim.active["idle_to_run"] and not anim.active["run"] then
+			anim:stop()
+			anim:play("idle_to_run", 1.0, 1.0, function(self)
 				self:play("run")
 			end)
 		end
@@ -266,7 +264,7 @@ function scene:enter()
 	end)
 
 	_G.EVENT:listen("use item", function()
-		self.player.animation:reset()
+		self.player.animation:stop()
 		self.player.animation:play("roll")
 
 		local item = self.player.items:get()
@@ -280,20 +278,20 @@ function scene:enter()
 	end)
 
 	_G.EVENT:listen("player attack", function()
-		self.player.animation:reset()
+		self.player.animation:stop()
 		self.player.animation:play("attack")
 		self.player.anim_cooldown = self.player.animation:length("attack")
 		self.player.stamina       = self.player.stamina - 0.10
 	end)
 
 	_G.EVENT:listen("player attack charge", function()
-		self.player.animation:reset()
+		self.player.animation:stop()
 		self.player.animation:play("attack_charge")
 		self.player.anim_cooldown = self.player.animation:length("attack_charge")
 	end)
 
 	_G.EVENT:listen("player attack heavy", function()
-		self.player.animation:reset()
+		self.player.animation:stop()
 		self.player.animation:play("attack_heavy")
 		self.player.anim_cooldown = self.player.animation:length("attack_heavy")
 		self.player.stamina       = self.player.stamina - 0.25
@@ -301,7 +299,7 @@ function scene:enter()
 	end)
 
 	_G.EVENT:listen("player dodge", function(direction, back)
-		self.player.animation:reset()
+		self.player.animation:stop()
 		self.player.stamina = self.player.stamina - 0.15
 
 		if back then
@@ -322,7 +320,7 @@ function scene:enter()
 	end)
 
 	_G.EVENT:listen("take damage", function()
-		self.player.animation:reset()
+		self.player.animation:stop()
 		self.player.animation:play("fall")
 		self.player.anim_cooldown = self.player.animation:length("fall")
 		self.player.iframes       = self.player.anim_cooldown * 2
@@ -341,21 +339,21 @@ function scene:enter()
 
 	-- Boss actions
 	_G.EVENT:listen("boss attack spike", function()
-		self.boss.animation:reset()
+		self.boss.animation:stop()
 		self.boss.animation:play("attack_spike")
 		self.boss.anim_cooldown   = self.boss.animation:length("attack_spike")
 		self.boss.attack_cooldown = self.boss.anim_cooldown + 1
 	end)
 
 	_G.EVENT:listen("boss attack stab", function()
-		self.boss.animation:reset()
+		self.boss.animation:stop()
 		self.boss.animation:play("attack_stab")
 		self.boss.anim_cooldown   = self.boss.animation:length("attack_stab")
 		self.boss.attack_cooldown = self.boss.anim_cooldown + 1
 	end)
 
 	_G.EVENT:listen("boss attack sweep", function()
-		self.boss.animation:reset()
+		self.boss.animation:stop()
 		self.boss.animation:play("attack_sweep")
 		self.boss.anim_cooldown   = self.boss.animation:length("attack_sweep")
 		self.boss.attack_cooldown = self.boss.anim_cooldown + 1
@@ -363,7 +361,7 @@ function scene:enter()
 	end)
 
 	_G.EVENT:listen("boss attack spin", function()
-		self.boss.animation:reset()
+		self.boss.animation:stop()
 		self.boss.animation:play("attack_spin")
 		self.boss.anim_cooldown   = self.boss.animation:length("attack_spin")
 		self.boss.attack_cooldown = self.boss.anim_cooldown + 1
@@ -371,7 +369,7 @@ function scene:enter()
 	end)
 
 	_G.EVENT:listen("boss walk", function()
-		self.boss.animation:reset()
+		self.boss.animation:stop()
 		self.boss.animation:play("walk")
 		self.boss.anim_cooldown = self.boss.animation:length("walk")
 
