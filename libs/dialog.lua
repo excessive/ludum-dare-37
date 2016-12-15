@@ -93,11 +93,11 @@ function dialog:_box(cx,cy,text)
 	--left
 	love.graphics.draw(dialog.img.edge,x-p,y+h,-math.pi/2,h,1)
 
-	love.graphics.printf(text,x+tpad,y+tpad,max_width,"left")
+	love.graphics.printf(text,math.floor(0.5+x+tpad),math.floor(0.5+y+tpad),max_width,"left")
 
 	local shadow = 2
 	love.graphics.setColor(0,0,0,31)
-	love.graphics.printf(text,x+tpad+shadow,y+tpad+shadow,max_width,"left")
+	love.graphics.printf(text,math.floor(0.5+x+tpad+shadow),math.floor(0.5+y+tpad+shadow),max_width,"left")
 
 	love.graphics.setColor(old_color)
 	love.graphics.setFont(old_font)
